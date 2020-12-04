@@ -374,7 +374,7 @@ nsresult nsHttpHandler::Init() {
 
   mRequestContextService = RequestContextService::GetOrCreate();
 
-#if defined(ANDROID)
+#if defined(ANDROID) || defined(MOZ_EMBEDLITE)
   mProductSub.AssignLiteral(MOZILLA_UAVERSION);
 #else
   mProductSub.AssignLiteral(LEGACY_UA_GECKO_TRAIL);
@@ -803,7 +803,7 @@ void nsHttpHandler::InitUserAgentComponents() {
 #endif
   );
 
-#ifdef ANDROID
+#if defined(ANDROID) || defined(MOZ_EMBEDLITE)
   nsCOMPtr<nsIPropertyBag2> infoService =
       do_GetService("@mozilla.org/system-info;1");
   MOZ_ASSERT(infoService, "Could not find a system info service");
@@ -838,9 +838,11 @@ void nsHttpHandler::InitUserAgentComponents() {
     }
   }
 
+#if defined(MOZ_WIDGET_ANDROID)
   if (Preferences::GetBool(UA_PREF("use_device"), false)) {
     mDeviceModelId = mozilla::net::GetDeviceModelId();
   }
+#endif  // MOZ_WIDGET_ANDROID
 #endif  // ANDROID
 
   // Gather OS/CPU.
